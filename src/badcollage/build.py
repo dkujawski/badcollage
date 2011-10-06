@@ -30,30 +30,32 @@ class Builder(object):
         return config
     
     def get_source_imgs(self):
+        """ return a list of random image objects from source dir as defined in
+        the config file of size also set in the config file.
+        """
         # get a list of files from the source directory
         file_list = [os.path.join(self.source_dir, f) 
                      for f in os.listdir(self.source_dir)]
-        print len(file_list)
         # get a random sample of files from the source directory
-        samples = random.sample(file_list, self.source_img_count)        
-        while samples:
+        while file_list:
             # convert the file paths into image objects
-            path = samples.pop()
+            path = random.choice(file_list)
+            file_list.remove(path)            
+            # check to see if this is an image
             img = get_img_obj(path)
             if img:
                 # add the image to the main image list
                 self.source_imgs.append(img)
             else:
                 # if this file is not an image remove it from the file list
-                file_list.remove(path)
                 if not file_list:
                     # if there are no more paths in the file list stop
                     break
-                # add a new random file from the file list and try again
-                samples.append(random.choice(file_list))
         return self.source_imgs
     
 def get_img_obj(file_path):
+    """ return an Image object from the file_path or False if not a valid image
+    """
     try:
         img = Image.open(file_path)
     except IOError as ioe:
